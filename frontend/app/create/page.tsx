@@ -140,7 +140,7 @@ export default function CreatePage() {
       const res = await processImages({
         image1: meme1File,
         image2: meme2File,
-        includeAudio: true,
+        includeAudio: false,
         durationSeconds: 6,
         jobId,
       });

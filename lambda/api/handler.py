@@ -58,18 +58,27 @@ def lambda_handler(event, context):
                 job_id = query_params.get('job_id') or str(uuid.uuid4())[:8]
                 image1_id = str(uuid.uuid4())[:12]
                 image2_id = str(uuid.uuid4())[:12]
-                image1_key = f"images/{image1_id}.png"
-                image2_key = f"images/{image2_id}.png"
                 
-                # Generate presigned URLs (valid for 5 minutes)
+                # Get content types from query params (fallback to image/png for compatibility)
+                image1_type = query_params.get('image1_type', 'image/png')
+                image2_type = query_params.get('image2_type', 'image/png')
+                
+                # Determine file extension based on content type
+                ext1 = 'jpg' if 'jpeg' in image1_type.lower() else ('heic' if 'heic' in image1_type.lower() else 'png')
+                ext2 = 'jpg' if 'jpeg' in image2_type.lower() else ('heic' if 'heic' in image2_type.lower() else 'png')
+                
+                image1_key = f"images/{image1_id}.{ext1}"
+                image2_key = f"images/{image2_id}.{ext2}"
+                
+                # Generate presigned URLs with the correct content type (valid for 5 minutes)
                 image1_url = s3_client.generate_presigned_url(
                     'put_object',
-                    Params={'Bucket': S3_BUCKET, 'Key': image1_key, 'ContentType': 'image/png'},
+                    Params={'Bucket': S3_BUCKET, 'Key': image1_key, 'ContentType': image1_type},
                     ExpiresIn=300
                 )
                 image2_url = s3_client.generate_presigned_url(
                     'put_object',
-                    Params={'Bucket': S3_BUCKET, 'Key': image2_key, 'ContentType': 'image/png'},
+                    Params={'Bucket': S3_BUCKET, 'Key': image2_key, 'ContentType': image2_type},
                     ExpiresIn=300
                 )
                 

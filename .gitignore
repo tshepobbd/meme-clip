@@ -24,6 +24,7 @@ override.tf.json
 # Terraform build artifacts
 *.zip
 api_lambda.zip
+handler.zip
 
 # OS/editor junk
 .DS_Store

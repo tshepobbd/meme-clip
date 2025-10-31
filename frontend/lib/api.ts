@@ -5,7 +5,11 @@
 /**
  * Get presigned S3 URLs for uploading images
  */
-async function getPresignedUrls(jobId: string): Promise<{
+async function getPresignedUrls(
+  jobId: string,
+  image1Type: string = "image/png",
+  image2Type: string = "image/png"
+): Promise<{
   job_id: string;
   image1_key: string;
   image1_url: string;
@@ -20,6 +24,8 @@ async function getPresignedUrls(jobId: string): Promise<{
   const url = new URL(apiUrl);
   url.searchParams.set("action", "presign");
   url.searchParams.set("job_id", jobId);
+  url.searchParams.set("image1_type", image1Type);
+  url.searchParams.set("image2_type", image2Type);
 
   const response = await fetch(url.toString(), {
     method: "GET",
@@ -40,12 +46,16 @@ async function getPresignedUrls(jobId: string): Promise<{
 /**
  * Upload a File directly to S3 using a presigned URL
  */
-async function uploadToS3(file: File, presignedUrl: string): Promise<void> {
+async function uploadToS3(
+  file: File,
+  presignedUrl: string,
+  contentType: string
+): Promise<void> {
   const response = await fetch(presignedUrl, {
     method: "PUT",
     body: file,
     headers: {
-      "Content-Type": file.type || "image/png",
+      "Content-Type": contentType,
     },
   });
 
@@ -98,13 +108,17 @@ export async function processImages(
   // Generate job ID if not provided
   const jobId = params.jobId || Math.random().toString(36).slice(2, 10);
 
-  // Step 1: Get presigned URLs
-  const presigned = await getPresignedUrls(jobId);
+  // Get file MIME types (mobile browsers may send different types)
+  const image1Type = params.image1.type || "image/png";
+  const image2Type = params.image2.type || "image/png";
 
-  // Step 2: Upload images directly to S3
+  // Step 1: Get presigned URLs with correct content types
+  const presigned = await getPresignedUrls(jobId, image1Type, image2Type);
+
+  // Step 2: Upload images directly to S3 with matching content types
   await Promise.all([
-    uploadToS3(params.image1, presigned.image1_url),
-    uploadToS3(params.image2, presigned.image2_url),
+    uploadToS3(params.image1, presigned.image1_url, image1Type),
+    uploadToS3(params.image2, presigned.image2_url, image2Type),
   ]);
 
   // Step 3: Trigger processing by POSTing S3 keys

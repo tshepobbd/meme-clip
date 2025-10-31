@@ -10,7 +10,7 @@ resource "aws_amplify_app" "frontend" {
   environment_variables = {
     AMPLIFY_MONOREPO_APP_ROOT = var.frontend_app_root   # "frontend"
     # Next.js public envs can be added here too
-    NEXT_PUBLIC_API_BASE_URL   = coalesce(var.frontend_next_public_api_base_url, "")
+    NEXT_PUBLIC_API_BASE_URL   = var.frontend_next_public_api_base_url != "" ? var.frontend_next_public_api_base_url : ""
   }
 
   build_spec = <<-YAML
@@ -57,7 +57,7 @@ output "amplify_default_domain" {
 }
 
 output "amplify_branch_url" {
-  value       = aws_amplify_branch.frontend_main.web_url
+  value       = "https://${var.amplify_branch_name}.${aws_amplify_app.frontend.default_domain}"
   description = "Amplify branch URL"
 }
 

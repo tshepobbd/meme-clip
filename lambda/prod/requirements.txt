@@ -1,0 +1,7 @@
+moviepy==1.0.3
+Pillow==10.1.0
+boto3>=1.26.0
+numpy<2.0.0
+imageio>=2.31,<3
+imageio-ffmpeg>=0.4.2
+

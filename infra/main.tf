@@ -5,6 +5,14 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 5.0"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = ">= 2.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.0"
+    }
   }
 }
 
@@ -56,6 +64,22 @@ resource "aws_s3_bucket_public_access_block" "media" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_cors_configuration" "media" {
+  bucket = aws_s3_bucket.media.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT", "POST", "GET", "HEAD"]
+    allowed_origins = [
+      "http://localhost:3000",
+      "https://*.amplifyapp.com",
+      "https://main.d319ovve5anjhx.amplifyapp.com"
+    ]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
 }
 
 # -------------------------

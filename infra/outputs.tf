@@ -28,4 +28,24 @@ output "aws_region" {
   value       = var.aws_region
 }
 
+output "amplify_app_id" {
+  description = "Amplify app id"
+  value       = aws_amplify_app.frontend.id
+}
+
+output "amplify_default_domain" {
+  description = "Amplify default domain"
+  value       = aws_amplify_app.frontend.default_domain
+}
+
+output "amplify_branch_url" {
+  description = "Amplify branch URL"
+  value       = "https://${var.amplify_branch_name}.${aws_amplify_app.frontend.default_domain}"
+}
+
+output "api_gateway_url" {
+  description = "API Gateway endpoint URL for processing images"
+  value       = "https://${aws_api_gateway_rest_api.api.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.prod.stage_name}/process"
+}
+
 

@@ -45,3 +45,5 @@ After apply, check:
 terraform output amplify_branch_url
 terraform output amplify_default_domain
 ```
+
+terraform apply -auto-approve -var="amplify_github_token=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"

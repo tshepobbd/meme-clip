@@ -199,7 +199,8 @@ def lambda_handler(event, context):
                     os.remove(p)
             except Exception:
                 pass
-         logger.info("Video Processing")
+        
+        logger.info("Video Processing Completed Successfully")
         return {
             "statusCode": 200,
             "body": json.dumps({

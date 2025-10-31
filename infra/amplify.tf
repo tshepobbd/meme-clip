@@ -26,7 +26,7 @@ resource "aws_amplify_app" "frontend" {
               commands:
                 - npm run build
           artifacts:
-            baseDirectory: .next
+            baseDirectory: out
             files:
               - '**/*'
           cache:
@@ -43,22 +43,7 @@ resource "aws_amplify_branch" "frontend_main" {
   environment_variables = {
     # Example extra envs for runtime/build
     NEXT_PUBLIC_S3_BUCKET = aws_s3_bucket.media.bucket
+    NEXT_PUBLIC_API_BASE_URL = var.frontend_next_public_api_base_url != "" ? var.frontend_next_public_api_base_url : "https://${aws_api_gateway_rest_api.api.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.prod.stage_name}/process"
   }
 }
-
-output "amplify_app_id" {
-  value       = aws_amplify_app.frontend.id
-  description = "Amplify app id"
-}
-
-output "amplify_default_domain" {
-  value       = aws_amplify_app.frontend.default_domain
-  description = "Amplify default domain"
-}
-
-output "amplify_branch_url" {
-  value       = "https://${var.amplify_branch_name}.${aws_amplify_app.frontend.default_domain}"
-  description = "Amplify branch URL"
-}
-
 

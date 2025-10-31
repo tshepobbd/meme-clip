@@ -21,6 +21,10 @@ override.tf.json
 *.tfvars
 *.tfvars.json
 
+# Terraform build artifacts
+*.zip
+api_lambda.zip
+
 # OS/editor junk
 .DS_Store
 Thumbs.db

@@ -110,9 +110,15 @@ def lambda_handler(event, context):
                     logger.info(f"Checking S3 for output: s3://{OUTPUT_BUCKET}/{output_key}")
                     s3_client.head_object(Bucket=OUTPUT_BUCKET, Key=output_key)
                     # File exists - generate a presigned URL for download (valid for 1 hour)
+                    # Include Content-Disposition header to force download on mobile browsers
+                    filename = output_key.split('/')[-1]  # Extract just the filename (e.g., "abc123.mp4")
                     download_url = s3_client.generate_presigned_url(
                         'get_object',
-                        Params={'Bucket': OUTPUT_BUCKET, 'Key': output_key},
+                        Params={
+                            'Bucket': OUTPUT_BUCKET,
+                            'Key': output_key,
+                            'ResponseContentDisposition': f'attachment; filename="{filename}"'
+                        },
                         ExpiresIn=3600
                     )
                     logger.info(f"Output file found, generated download URL")

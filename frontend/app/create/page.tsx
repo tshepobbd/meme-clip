@@ -272,14 +272,31 @@ export default function CreatePage() {
                 </div>
               </div>
               {jobStatus === "completed" && downloadUrl && (
-                <a
-                  href={downloadUrl}
-                  download
+                <button
+                  onClick={async () => {
+                    try {
+                      // For mobile browsers, fetch as blob and create download link
+                      const response = await fetch(downloadUrl);
+                      const blob = await response.blob();
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `${currentJobId || "video"}.mp4`;
+                      document.body.appendChild(a);
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                      document.body.removeChild(a);
+                    } catch (err) {
+                      console.error("Download failed:", err);
+                      // Fallback: open in new tab
+                      window.open(downloadUrl, "_blank");
+                    }
+                  }}
                   className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
                 >
                   <Download className="w-4 h-4" />
                   Download Video
-                </a>
+                </button>
               )}
             </div>
           </div>
